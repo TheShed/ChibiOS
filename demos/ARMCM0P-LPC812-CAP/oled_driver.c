@@ -392,9 +392,6 @@ void DISP_display_offset( const FONT_INFO *font, uint8_t page, uint8_t col,
   DISP_display_buffer( font, page, col );
 }
 
-
-
 //=====================================
 //  The End
 //=====================================
-
