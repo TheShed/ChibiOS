@@ -182,7 +182,7 @@ int main(void)
       case DISP_MODE_SPEED:
         //DBUFF_float( NULL, vtg.speed, 5, 1, false );
         //DISP_display_buffer( &font_30x20, 0, 10 );
-        DBUFF_decimal( NULL, (vtg.speed/10), 3, false );
+        DBUFF_decimal( NULL, ((vtg.speed+50)/100), 3, false );
         DISP_display_buffer( &font_30x20, 0, 30 );
 
         DISP_display_string(   &font_7x5, 3, 94, "kmh" );
