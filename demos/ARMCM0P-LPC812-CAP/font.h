@@ -5,7 +5,7 @@
 #ifndef _FONT_H_
 #define _FONT_H_
 
-#include "stdint.h"
+#include "chtypes.h"
 
 // ==========================================================================
 // ==========================================================================
@@ -18,6 +18,7 @@ typedef struct
   const uint8_t  endChar;      // last character in the font
   const uint8_t  widthPixels;  // charter width, in pixels
   const uint8_t  spacing;      // inter-character spacing, in pixels
+  const uint8_t  digit_only;   // digit only font
   const uint8_t* data;         // pointer to font data array
 } FONT_INFO;
 // ==========================================================================

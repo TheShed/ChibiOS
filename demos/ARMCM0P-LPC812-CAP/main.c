@@ -21,8 +21,8 @@
 #define DISP_MODE_HEAD              0
 #define DISP_MODE_SPEED             1
 #define DISP_MODE_WP                2
-#define DISP_MODE_STATUS            3
-#define DISP_MODE_END               4
+#define DISP_MODE_END               3
+#define DISP_MODE_STATUS            4
 //#define DISP_MODE_MENU              10
 //#define DISP_MODE_SLEEP             20
 #define DISP_MODE_AUTO              31
@@ -92,7 +92,7 @@ static const GPTConfig gpt1cfg = {
 };
 
 //=====================================
-static void splash_screen( void )
+static void screen_splash( void )
 {
   DISP_display_string( &font_7x5, 0,  3, "www.TorqueRacing.net" );
 
@@ -101,6 +101,41 @@ static void splash_screen( void )
 
   chThdSleepSeconds(5);
   DISP_clear();
+}
+
+//=====================================
+static void screen_waypoint( void )
+{
+  int32_t offset;
+  uint32_t distance;
+  
+// distance = ((rmb.dest_range*1852)/1609);     // miles
+  distance = ((rmb.dest_range*1852)/100);       // metres
+  
+  if( distance > 1000 )
+  {
+    distance /= 10;
+    DBUFF_float( NULL, distance, 5, 2, false );   // km
+    DISP_display_buffer( &font_24x16, 1, 20 );
+    DISP_display_string(   &font_7x5, 3, 100, "km" );
+  }
+  else
+  {
+    DBUFF_decimal( NULL, distance, 5, false );
+    DISP_display_buffer( &font_24x16, 1, 12 );
+    DISP_display_string(   &font_7x5, 3, 100, "m " );
+  }
+
+  offset = ((rmb.dest_bearing+5)/10) - ((vtg.track_true+5)/10);
+  if( offset > 180 )
+    offset -= 360;
+  if( offset < -180 )
+    offset += 360;
+  DISP_display_offset( &font_7x5, 0, 1, offset );
+
+  // debug
+  //DBUFF_decimal( NULL, (rmb.dest_bearing+5)/10, 3, true );
+  //DISP_display_buffer(   &font_7x5, 0, 100 );
 }
 
 //=====================================
@@ -123,7 +158,7 @@ int main(void)
   DISP_Start( &SPID1 );
   DISP_clear();
   
-  splash_screen();
+  screen_splash();
   
   // and GO!!!
   chEvtGetAndClearEvents( ALL_EVENTS );
@@ -139,7 +174,7 @@ int main(void)
     {
       evMask = EV_UPDATE;
     }
-    palTogglePad(GPIO0, LED_BLUE);
+    //palTogglePad(GPIO0, LED_BLUE);
 
     // do Menu/Sleep here
     
@@ -148,7 +183,7 @@ int main(void)
       disp_mode++;
       if( disp_mode >= DISP_MODE_END )
       {
-        disp_mode = 0;
+        disp_mode = DISP_MODE_HEAD;
       }
       chEvtAddEvents( EV_REDRAW );
       continue;
@@ -180,8 +215,6 @@ int main(void)
       {
       
       case DISP_MODE_SPEED:
-        //DBUFF_float( NULL, vtg.speed, 5, 1, false );
-        //DISP_display_buffer( &font_30x20, 0, 10 );
         DBUFF_decimal( NULL, ((vtg.speed+50)/100), 3, false );
         DISP_display_buffer( &font_30x20, 0, 30 );
 
@@ -189,13 +222,7 @@ int main(void)
         break;
         
       case DISP_MODE_WP:
-        DISP_display_string(   &font_7x5, 0, 0, "          +<<<<<     " );
-//      DBUFF_float( NULL, ((rmb.dest_range*1852)/1609), 5, 2, false ); // mile
-        DBUFF_float( NULL, ((rmb.dest_range*1852)/1000), 5, 2, false ); // km
-        DISP_display_buffer( &font_24x16, 1, 20 );
-
-        DBUFF_decimal( NULL, (rmb.dest_bearing+5)/10, 3, true );
-        DISP_display_buffer(   &font_7x5, 0, 100 );
+        screen_waypoint();
         break;
 
       case DISP_MODE_STATUS:

@@ -111,13 +111,13 @@ static const uint8_t Tahoma_8pt_data[] = {
 // Font information for Tahoma 8pt
 const FONT_INFO font_7x5 =
 {
-  1,                                  /*  Height, in pages */
-  0x20,                               /*  Start character */
-  0x7f,                               /*  End character */
-  5,                                  /*  Width, in pixels */
+  1,                                  /* Height, in pages */
+  0x20,                               /* Start character */
+  0x7f,                               /* End character */
+  5,                                  /* Width, in pixels */
   1,                                  // spacing
-//  NULL,                               /*  Character descriptor array */
-  Tahoma_8pt_data,                    /*  Character bitmap array */
+  false,                              // not 'digit only' font
+  Tahoma_8pt_data
 };
 
 

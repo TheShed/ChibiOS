@@ -196,7 +196,7 @@ static void DISP_set_pos( uint8_t page, uint8_t col )
 }
 
 //===========================================================================
-void DISP_display_char( const FONT_INFO *font, uint8_t page, uint8_t col, char ch )
+int DISP_display_char( const FONT_INFO *font, uint8_t page, uint8_t col, char ch )
 {
   static const uint8_t spacing[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -205,15 +205,22 @@ void DISP_display_char( const FONT_INFO *font, uint8_t page, uint8_t col, char c
   int idx;
   const uint8_t *p;
   int i;
+  int ch_width = font->widthPixels;
 
   if( (ch < font->startChar) || (ch > font->endChar) )
   {
-    p = &(spacing[0]);
+    if( font->digit_only && (ch == '.') )
+    {
+      p = &(font->data[10*(ch_width*font->heightPages)]);
+      ch_width /= 2;
+    }
+    else
+      p = &(spacing[0]);
   }
   else
   {
     idx = (ch - font->startChar);
-    p = &(font->data[idx*(font->widthPixels*font->heightPages)]);
+    p = &(font->data[idx*(ch_width*font->heightPages)]);
   }
 
                             
@@ -221,12 +228,14 @@ void DISP_display_char( const FONT_INFO *font, uint8_t page, uint8_t col, char c
   {
     DISP_set_pos( page, col );
     page++;
-    write_data( (uint8_t *)p, font->widthPixels );
+    write_data( (uint8_t *)p, ch_width );
     if( p != &(spacing[0]) )
-      p += font->widthPixels;
+      p += ch_width;
     if( font->spacing )
       write_data( (uint8_t *)spacing, font->spacing );
   }
+  
+  return ch_width+font->spacing;
 }
 
 //===========================================================================
@@ -234,8 +243,7 @@ void DISP_display_string( const FONT_INFO *font, uint8_t page, uint8_t col, char
 {
   while(*str != 0)
   {
-    DISP_display_char( font, page, col, *str );
-    col += (font->widthPixels+font->spacing);
+    col += DISP_display_char( font, page, col, *str );
     str++;
   }
 }
@@ -351,6 +359,39 @@ void DISP_display_latlon( const FONT_INFO *font, uint8_t page, uint8_t col,
   
   DISP_display_buffer( font, page, col );
 }
+
+//===========================================================================
+void DISP_display_offset( const FONT_INFO *font, uint8_t page, uint8_t col,
+                          int32_t offset )
+{
+  uint8_t *p = &disp_buffer[0];
+
+  *p++ = (offset<-90)?'*':'|';
+  *p++ = (offset<-70)?'<':' ';
+  *p++ = (offset<-50)?'<':' ';
+  *p++ = (offset<-40)?'<':' ';
+  *p++ = (offset<-30)?'<':' ';
+  *p++ = (offset<-20)?'<':' ';
+  *p++ = (offset<-15)?'<':' ';
+  *p++ = (offset<-10)?'<':' ';
+  *p++ = (offset<- 6)?'<':' ';
+  *p++ = (offset<- 3)?'<':' ';
+  *p++ = '+';
+  *p++ = (offset>  3)?'>':' ';
+  *p++ = (offset>  6)?'>':' ';
+  *p++ = (offset> 10)?'>':' ';
+  *p++ = (offset> 15)?'>':' ';
+  *p++ = (offset> 20)?'>':' ';
+  *p++ = (offset> 30)?'>':' ';
+  *p++ = (offset> 40)?'>':' ';
+  *p++ = (offset> 50)?'>':' ';
+  *p++ = (offset> 70)?'>':' ';
+  *p++ = (offset> 90)?'*':'|';
+  *p   = '\0';
+  
+  DISP_display_buffer( font, page, col );
+}
+
 
 
 //=====================================
