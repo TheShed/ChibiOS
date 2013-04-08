@@ -13,7 +13,7 @@
 // Describes a single font
 typedef struct
 {
-  const uint8_t  heightPages;  // charter height, in pages 
+  const uint8_t  heightPages;  // character height, in pages
   const uint8_t  startChar;    // first character in the font
   const uint8_t  endChar;      // last character in the font
   const uint8_t  widthPixels;  // charter width, in pixels

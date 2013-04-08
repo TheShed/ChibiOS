@@ -53,7 +53,7 @@ static WORKING_AREA(waButtonThread, 32);
 static msg_t ButtonThread( void *thread_p )
 {
   uint32_t last_buttons = palReadPad(GPIO0, BUTTON_0);
-  
+
   while( true )
   {
     uint32_t new_buttons;
@@ -66,7 +66,7 @@ static msg_t ButtonThread( void *thread_p )
     {
       continue;
     }
-    
+
     emButton  =  new_buttons &  last_buttons;     // pressed buttons
     emButton |= (new_buttons & ~last_buttons)<<4; // released buttons
     chEvtSignal( (Thread *)thread_p, emButton );
@@ -108,10 +108,10 @@ static void screen_waypoint( void )
 {
   int32_t offset;
   uint32_t distance;
-  
+
 // distance = ((rmb.dest_range*1852)/1609);     // miles
   distance = ((rmb.dest_range*1852)/100);       // metres
-  
+
   if( distance > 1000 )
   {
     distance /= 10;
@@ -132,17 +132,13 @@ static void screen_waypoint( void )
   if( offset < -180 )
     offset += 360;
   DISP_display_offset( &font_7x5, 0, 1, offset );
-
-  // debug
-  //DBUFF_decimal( NULL, (rmb.dest_bearing+5)/10, 3, true );
-  //DISP_display_buffer(   &font_7x5, 0, 100 );
 }
 
 //=====================================
 //=====================================
 int main(void)
 {
-  
+
   halInit();
   chSysInit();
 
@@ -157,9 +153,9 @@ int main(void)
 
   DISP_Start( &SPID1 );
   DISP_clear();
-  
+
   screen_splash();
-  
+
   // and GO!!!
   chEvtGetAndClearEvents( ALL_EVENTS );
 
@@ -168,16 +164,15 @@ int main(void)
 
   do {
     eventmask_t evMask;
-    
+
     evMask = chEvtWaitAnyTimeout(ALL_EVENTS,  MS2ST(DISP_UPDATE_INTERVAL) );
     if( !evMask )
     {
       evMask = EV_UPDATE;
     }
-    //palTogglePad(GPIO0, LED_BLUE);
 
     // do Menu/Sleep here
-    
+
     if( evMask & EV_BUTTON_1_PRESS )
     {
       disp_mode++;
@@ -204,7 +199,7 @@ int main(void)
       gptStartOneShot(&GPTD1, 5000);          // 5 sec
       disp_mode = DISP_MODE_STATUS;
     }
-    
+
     if( evMask & EV_REDRAW )
     {
       DISP_clear();    
@@ -213,14 +208,14 @@ int main(void)
     {
       switch(disp_mode)
       {
-      
+
       case DISP_MODE_SPEED:
-        DBUFF_decimal( NULL, ((vtg.speed+50)/100), 3, false );
+        DBUFF_decimal( NULL, ((vtg.speed+5)/10), 3, false );
         DISP_display_buffer( &font_30x20, 0, 30 );
 
         DISP_display_string(   &font_7x5, 3, 94, "kmh" );
         break;
-        
+
       case DISP_MODE_WP:
         screen_waypoint();
         break;
@@ -235,7 +230,7 @@ int main(void)
         DISP_display_latlon(   &font_7x5, 2, 0, rmc.lat,  rmc.N, true );
         DISP_display_latlon(   &font_7x5, 3, 0, rmc.lon,  rmc.E, false );
         break;
-        
+
       case DISP_MODE_HEAD:
       default:
         DBUFF_decimal( NULL, (vtg.track_true+5)/10, 3, true );
@@ -249,7 +244,7 @@ int main(void)
   
 
   } while (TRUE);
-  
+
   return 0;
 }
 

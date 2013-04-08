@@ -57,7 +57,7 @@ static bool gps_nextToken( SerialDriver *sdp, uint8_t *buffer, int len )
     break;
 
   }while(1);
-  
+
   return true;
 }
 
@@ -107,7 +107,7 @@ static uint32_t gps_read_uint( SerialDriver *sdp, uint32_t dec_place )
           break;
         }
         dec_place--;
-      } 
+      }
 
       if( !isdigit(ch) )
       {
@@ -141,7 +141,7 @@ static msg_t GPS_Parser_Task(void *arg)
 
   do {
     int32_t ch;
-    
+
     //palSetPad(GPIO0, LED_GREEN);
     ch = sdGetTimeout( sdp, S2ST(2) );
     if( ch == Q_TIMEOUT )
@@ -161,7 +161,7 @@ static msg_t GPS_Parser_Task(void *arg)
     {
       continue;
     }
-    
+
     if( !strcmp((const char *)buffer,"GPGGA") )
     {
       gga.time    = gps_read_uint( sdp,  0 );
@@ -220,7 +220,7 @@ static msg_t GPS_Parser_Task(void *arg)
                        gps_read_bool( sdp, 'N' );     // 'N' - kNots
       vtg.speed      = gps_read_uint( sdp,  1 );      // speed in km/h
     }
-    
+
   } while (TRUE);
   
   return 0;
