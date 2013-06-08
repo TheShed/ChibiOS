@@ -3,7 +3,7 @@ import serial
 import array
 
 #=========================================================
-PORT = '/dev/ttyUSB1'
+PORT = '/dev/ttyUSB0'
 FILE = 'build/ch.bin'
 
 RAM_ADDR    = 0x10000300
