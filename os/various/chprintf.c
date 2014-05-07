@@ -112,7 +112,7 @@ static char *ftoa(char *p, double num) {
 void chvprintf(BaseSequentialStream *chp, const char *fmt, va_list ap) {
   char *p, *s, c, filler;
   int i, precision, width;
-  bool_t is_long, left_align;
+  bool is_long, left_align;
   long l;
 #if CHPRINTF_USE_FLOAT
   float f;
@@ -246,12 +246,12 @@ unsigned_common:
         chSequentialStreamPut(chp, (uint8_t)*s++);
         i--;
       }
-      do
+      do {
         chSequentialStreamPut(chp, (uint8_t)filler);
-      while (++width != 0);
+      } while (++width != 0);
     }
-    chSequentialStreamWrite(chp, (uint8_t*)s, i);
-    s += i;
+    while (--i >= 0)
+      chSequentialStreamPut(chp, (uint8_t)*s++);
 
     while (width) {
       chSequentialStreamPut(chp, (uint8_t)filler);

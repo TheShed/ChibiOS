@@ -325,7 +325,7 @@ typedef void (*usbeventcb_t)(USBDriver *usbp, usbevent_t event);
  * @retval FALSE        Request not recognized by the handler.
  * @retval TRUE         Request handled.
  */
-typedef bool_t (*usbreqhandler_t)(USBDriver *usbp);
+typedef bool (*usbreqhandler_t)(USBDriver *usbp);
 
 /**
  * @brief   Type of an USB descriptor-retrieving callback.
@@ -451,9 +451,6 @@ typedef const USBDescriptor * (*usbgetdescriptor_t)(USBDriver *usbp,
   (usbp)->ep0endcb = (endcb);                                               \
 }
 
-#define usbSetupEnd(usbp, ep)                                               \
-  usb_lld_end_transaction(usbp, ep)
-
 /**
  * @brief   Reads a setup packet from the dedicated packet buffer.
  * @details This function must be invoked in the context of the @p setup_cb
@@ -559,13 +556,13 @@ extern "C" {
   void usbPrepareTransmit(USBDriver *usbp, usbep_t ep,
                           const uint8_t *buf, size_t n);
   void usbPrepareQueuedReceive(USBDriver *usbp, usbep_t ep,
-                               InputQueue *iqp, size_t n);
+                               input_queue_t *iqp, size_t n);
   void usbPrepareQueuedTransmit(USBDriver *usbp, usbep_t ep,
-                                OutputQueue *oqp, size_t n);
-  bool_t usbStartReceiveI(USBDriver *usbp, usbep_t ep);
-  bool_t usbStartTransmitI(USBDriver *usbp, usbep_t ep);
-  bool_t usbStallReceiveI(USBDriver *usbp, usbep_t ep);
-  bool_t usbStallTransmitI(USBDriver *usbp, usbep_t ep);
+                                output_queue_t *oqp, size_t n);
+  bool usbStartReceiveI(USBDriver *usbp, usbep_t ep);
+  bool usbStartTransmitI(USBDriver *usbp, usbep_t ep);
+  bool usbStallReceiveI(USBDriver *usbp, usbep_t ep);
+  bool usbStallTransmitI(USBDriver *usbp, usbep_t ep);
   void _usb_reset(USBDriver *usbp);
   void _usb_ep0setup(USBDriver *usbp, usbep_t ep);
   void _usb_ep0in(USBDriver *usbp, usbep_t ep);
